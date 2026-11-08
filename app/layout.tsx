@@ -20,10 +20,14 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
+      <head>
+      <meta name="google-site-verification" content="4uD8wNLs_rTfgKDxIQiql9pCR2dsptjjLflFTzf2-2s" />
+      </head>
       {/* Zidna suppressHydrationWarning hna bach Next.js y-ignori les extensions */}
       <body suppressHydrationWarning className="antialiased">
         {children}
       </body>
+      
     </html>
   );
 }
