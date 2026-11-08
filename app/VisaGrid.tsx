@@ -1,15 +1,29 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
 export default function VisaGrid({ visaData }: { visaData: any[] }) {
   const [search, setSearch] = useState('');
-  
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 16; // Ch7al mn blad f kol page (t9der tbdelha)
+
+  // Mli y-tapez chi 7aja f search, rje3 l-page 1
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search]);
+
+  // L-Boldan li m-filtryin b l-mots clés
   const filteredVisas = visaData.filter(visa => 
     visa.title.toLowerCase().includes(search.toLowerCase()) || 
     visa.country.toLowerCase().includes(search.toLowerCase())
   );
+
+  // L-Mantig dyal l-Pagination
+  const totalPages = Math.ceil(filteredVisas.length / itemsPerPage);
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredVisas.slice(indexOfFirstItem, indexOfLastItem);
 
   return (
     <div className="max-w-7xl mx-auto w-full">
@@ -30,19 +44,22 @@ export default function VisaGrid({ visaData }: { visaData: any[] }) {
       </div>
 
       {/* Grid dyal l-Boldan */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {filteredVisas.length > 0 ? (
-          filteredVisas.map((visa) => (
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-12">
+        {currentItems.length > 0 ? (
+          currentItems.map((visa) => (
             <Link 
               key={visa.country} 
               href={`/${visa.country}-visa-photo`}
               className="bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100 dark:border-gray-700 p-6 flex flex-col items-center text-center group hover:-translate-y-1"
             >
-              <div className="w-16 h-16 bg-blue-50 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-200">
-                <svg className="w-8 h-8 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                </svg>
+              <div className="w-16 h-16 bg-gray-50 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4 overflow-hidden shadow-sm group-hover:scale-110 transition-transform duration-200">
+                {/* Drapo mn FlagCDN b Lazy Loading bach mayt9elch */}
+                <img 
+                  src={`https://flagcdn.com/w80/${visa.iso}.png`} 
+                  alt={`${visa.title} flag`}
+                  loading="lazy"
+                  className="w-10 object-cover"
+                />
               </div>
               <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                 {visa.title}
@@ -58,6 +75,31 @@ export default function VisaGrid({ visaData }: { visaData: any[] }) {
           </div>
         )}
       </div>
+
+      {/* Pagination UI */}
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center space-x-2">
+          <button 
+            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            className="px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+          >
+            Previous
+          </button>
+          
+          <span className="text-gray-600 dark:text-gray-400 px-4">
+            Page <span className="font-bold">{currentPage}</span> of {totalPages}
+          </span>
+
+          <button 
+            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages}
+            className="px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 }
