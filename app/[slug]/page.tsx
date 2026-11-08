@@ -6,8 +6,7 @@ type Props = {
   params: Promise<{ slug: string }>;
 };
 
-// 1. Zidna hadi bach n-forciw Next.js y-générer kolchi statique l-SEO bla mochkil dyal Suspense
-export const dynamicParams = false;
+
 
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
