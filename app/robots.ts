@@ -6,6 +6,6 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: '*',
       allow: '/',
     },
-    sitemap: 'https://ton-site.vercel.app/sitemap.xml',
+    sitemap: 'https://visaphotomaker.online/sitemap.xml',
   };
 }
